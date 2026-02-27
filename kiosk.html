@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DTC Kiosk</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{margin:0;background:#0b0f14;color:white;font-family:system-ui;}
+header{padding:14px;text-align:center;font-weight:bold;font-size:20px;border-bottom:1px solid #1b2430;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;padding:20px;}
+.card{background:#101722;border-radius:20px;padding:15px;text-align:center;cursor:pointer;transition:.2s;border:2px solid transparent;}
+.card:hover{transform:scale(1.05);border-color:#2b6cff;}
+.photo{width:160px;height:160px;object-fit:cover;border-radius:20px;margin-bottom:10px;}
+.name{font-weight:700;font-size:18px;}
+.status{margin-top:5px;font-size:13px;opacity:.7;}
+.bigMessage{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;flex-direction:column;font-size:40px;font-weight:bold;}
+.reportBox{position:fixed;bottom:0;left:0;right:0;background:#111;padding:10px;font-size:14px;border-top:1px solid #222;}
+</style>
+</head>
+<body>
+
+<header>DTC – Control de Entrada / Salida</header>
+
+<div class="grid" id="grid"></div>
+<div class="bigMessage" id="bigMessage"></div>
+<div class="reportBox" id="reportBox">Horas hoy: cargando...</div>
+
+<script>
+const SUPABASE_URL="https://mugufzwvwteoopjdrheq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_npn2NhS9fEHAjWHGsbLTSQ_KudyqrFt";
+
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+let session=null;
+let orgId=null;
+let employees=[];
+let lastState={};
+
+function $(id){return document.getElementById(id);}
+
+async function init(){
+  const {data}=await sb.auth.getSession();
+  session=data.session;
+  if(!session){alert("Inicia sesión primero");location.href="app.html";return;}
+
+  const {data:prof}=await sb.from("profiles").select("organization_id").eq("id",session.user.id).single();
+  orgId=prof.organization_id;
+
+  loadEmployees();
+}
+
+async function loadEmployees(){
+  const {data}=await sb
+    .from("employees")
+    .select("id,first_name,last_name,photo_url,status")
+    .eq("organization_id",orgId)
+    .eq("status","active");
+
+  employees=data||[];
+  await loadLastEvents();
+  render();
+  loadDailyReport();
+}
+
+async function loadLastEvents(){
+  const {data}=await sb
+    .from("employee_attendance")
+    .select("employee_id,event_type,created_at")
+    .eq("organization_id",orgId)
+    .order("created_at",{ascending:false});
+
+  lastState={};
+  if(data){
+    data.forEach(row=>{
+      if(!lastState[row.employee_id]){
+        lastState[row.employee_id]=row.event_type;
+      }
+    });
+  }
+}
+
+function render(){
+  $("grid").innerHTML="";
+  employees.forEach(e=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      ${e.photo_url?`<img src="${e.photo_url}" class="photo"/>`:""}
+      <div class="name">${e.first_name} ${e.last_name}</div>
+      <div class="status">${lastState[e.id]==="in"?"En el local":"Fuera"}</div>
+    `;
+    div.onclick=()=>toggleAttendance(e);
+    $("grid").appendChild(div);
+  });
+}
+
+async function toggleAttendance(emp){
+  const current=lastState[emp.id]==="in"?"out":"in";
+
+  await sb.from("employee_attendance").insert([{
+    organization_id:orgId,
+    employee_id:emp.id,
+    event_type:current
+  }]);
+
+  lastState[emp.id]=current;
+  showBigMessage(emp,current);
+  render();
+  loadDailyReport();
+}
+
+function showBigMessage(emp,type){
+  const msg=$("bigMessage");
+  msg.style.display="flex";
+  msg.innerHTML=`
+    ${emp.first_name}<br>
+    ${type==="in"?"ENTRÓ":"SALIO"}<br>
+    <span style="font-size:20px;">${new Date().toLocaleTimeString()}</span>
+  `;
+  setTimeout(()=>{msg.style.display="none";},2000);
+}
+
+async function loadDailyReport(){
+  const today=new Date().toISOString().split("T")[0];
+  const {data}=await sb.rpc("get_daily_work_hours",{p_org:orgId,p_date:today});
+
+  if(!data){$("reportBox").innerText="Horas hoy: 0";return;}
+
+  let total=0;
+  let html="Horas hoy: ";
+  data.forEach(row=>{
+    total+=Number(row.total_hours);
+    html+=`${row.full_name} ${row.total_hours.toFixed(2)}h | `;
+  });
+
+  html+=` TOTAL ${total.toFixed(2)}h`;
+  $("reportBox").innerText=html;
+}
+
+init();
+</script>
+
+</body>
+</html>
