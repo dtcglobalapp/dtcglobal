@@ -1,395 +1,634 @@
-// src/lobby.js
-import { supabase, hasSupabaseConfig } from "../core/supabase.js";
-
-const root = document.getElementById("lobby-root");
+const root = document.getElementById("app");
 
 if (!root) {
-  document.body.innerHTML = "❌ No encuentro #lobby-root en index.html";
-  throw new Error("Missing #lobby-root");
+  throw new Error("No se encontró #app para montar el Lobby.");
 }
 
-const css = `
-  :root{
-    --bg0:#0b0d11;
-    --bg1:rgba(255,255,255,.04);
-    --bdr:rgba(255,255,255,.10);
-    --bdr2:rgba(255,255,255,.16);
-    --txt:rgba(255,255,255,.92);
-    --mut:rgba(255,255,255,.70);
-    --mut2:rgba(255,255,255,.55);
-    --ok:#30d158;
-    --bad:#ff4d5a;
-    --accent:#4ea1ff;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    background:
-      radial-gradient(1200px 600px at 30% 10%, rgba(255,255,255,.06), transparent 60%),
-      radial-gradient(900px 500px at 80% 30%, rgba(78,161,255,.06), transparent 60%),
-      var(--bg0);
-    color:var(--txt);
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  }
-  .wrap{max-width:1440px;margin:0 auto;padding:26px}
-  .card{
-    border:1px solid var(--bdr);
-    background:var(--bg1);
-    border-radius:24px;
-    box-shadow:0 18px 60px rgba(0,0,0,.55);
-  }
-  .hero{
-    display:flex;align-items:center;gap:14px;
-    padding:18px 20px;
-  }
-  .logo{
-    width:58px;height:58px;border-radius:18px;
-    display:grid;place-items:center;
-    border:1px solid var(--bdr);
-    background: rgba(255,255,255,.05);
-    font-size:22px;font-weight:900;
-  }
-  .title{font-size:30px;font-weight:900;margin:0}
-  .sub{color:var(--mut);font-size:14px;margin-top:2px}
-  .grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px;
-  }
-  @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
-  .pane{padding:22px}
-  .h2{font-size:26px;font-weight:900;margin:0 0 8px}
-  .mut{color:var(--mut);line-height:1.5}
-  .mut2{color:var(--mut2)}
-  label{
-    display:block;color:var(--mut);font-weight:650;margin:14px 0 6px;
-  }
-  input{
-    width:100%;
-    padding:14px 14px;
-    border-radius:16px;
-    border:1px solid rgba(255,255,255,.10);
-    background: rgba(0,0,0,.22);
-    color:var(--txt);
-    outline:none;
-    font-size:16px;
-  }
-  input:focus{
-    border-color:rgba(78,161,255,.55);
-    box-shadow:0 0 0 3px rgba(78,161,255,.12);
-  }
-  .btn{
-    width:100%;
-    cursor:pointer;
-    border:1px solid var(--bdr);
-    background: rgba(255,255,255,.05);
-    color:var(--txt);
-    padding:14px 16px;
-    border-radius:16px;
-    font-weight:800;
-    font-size:16px;
-    margin-top:14px;
-  }
-  .btn:hover{border-color:var(--bdr2)}
-  .btn.primary{
-    border-color:rgba(78,161,255,.45);
-    box-shadow: inset 0 0 0 1px rgba(78,161,255,.20);
-  }
-  .divider{
-    border:0;border-top:1px solid rgba(255,255,255,.10);margin:18px 0;
-  }
-  .note{
-    margin-top:16px;color:var(--mut2);font-size:14px;
-  }
-  .config{
-    margin-top:16px;
-    padding:16px;
-    border:1px dashed rgba(255,255,255,.12);
-    border-radius:18px;
-    background:rgba(255,255,255,.03);
-  }
-  .toast{
-    position:fixed;left:18px;right:18px;bottom:18px;max-width:980px;margin:0 auto;
-    border-radius:18px;padding:14px 16px;
-    background:rgba(15,18,25,.88);
-    border:1px solid rgba(255,255,255,.12);
-    backdrop-filter: blur(10px);
-    box-shadow:0 18px 60px rgba(0,0,0,.55);
-    display:none;align-items:center;gap:12px;
-  }
-  .dot{width:12px;height:12px;border-radius:50%;background:var(--ok)}
-  .dot.bad{background:var(--bad)}
-  .toast-title{font-weight:900;font-size:16px}
-  .toast-msg{color:var(--mut)}
-  .toast button{
-    margin-left:auto;border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.04);color:var(--txt);
-    border-radius:12px;padding:8px 12px;font-weight:800;cursor:pointer;
-  }
+root.innerHTML = `
+  <style>
+    :root{
+      --bg-1:#050816;
+      --bg-2:#0a1020;
+      --card:rgba(255,255,255,0.08);
+      --card-2:rgba(255,255,255,0.05);
+      --border:rgba(255,255,255,0.12);
+      --text:#f3f6fb;
+      --muted:#b3bfd3;
+      --accent:#3b82f6;
+      --shadow:0 18px 48px rgba(0,0,0,.34);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:18px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top center, rgba(59,130,246,.16), transparent 30%),
+        linear-gradient(180deg,var(--bg-2),var(--bg-1));
+    }
+
+    body{
+      padding:24px 14px 40px;
+    }
+
+    .lobby-page{
+      width:min(100%, 1380px);
+      margin:0 auto;
+      display:grid;
+      gap:20px;
+    }
+
+    .glass{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .hero{
+      border-radius:var(--radius-xl);
+      padding:18px 20px;
+      display:grid;
+      grid-template-columns:84px 1fr auto;
+      gap:16px;
+      align-items:center;
+    }
+
+    .dtc-home{
+      width:84px;
+      height:84px;
+      border-radius:24px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      text-decoration:none;
+      color:var(--text);
+      flex-shrink:0;
+      cursor:pointer;
+    }
+
+    .dtc-home::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at center, rgba(59,130,246,.18), transparent 60%);
+      opacity:.95;
+    }
+
+    .dtc-home::after{
+      content:"";
+      position:absolute;
+      width:120%;
+      height:22%;
+      background:rgba(255,255,255,.10);
+      top:18%;
+      left:-10%;
+      border-radius:999px;
+      transform-origin:center;
+      animation:dtcBlink 5.8s infinite ease-in-out;
+      pointer-events:none;
+    }
+
+    .dtc-home span{
+      position:relative;
+      z-index:2;
+      font-weight:800;
+      letter-spacing:.08em;
+      font-size:1.05rem;
+      text-shadow:0 0 14px rgba(59,130,246,.20);
+    }
+
+    @keyframes dtcBlink{
+      0%,44%,48%,100%{ transform:scaleY(.15); opacity:0; }
+      45%,47%{ transform:scaleY(1); opacity:1; }
+    }
+
+    .hero-copy h1{
+      margin:0;
+      font-size:clamp(2rem,4vw,3.2rem);
+      line-height:1.02;
+      letter-spacing:-.04em;
+    }
+
+    .hero-copy p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:1.08rem;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:14px 18px;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.08);
+    }
+
+    .btn-primary{
+      border-color:rgba(59,130,246,.55);
+      box-shadow:
+        inset 0 0 0 1px rgba(59,130,246,.25),
+        0 0 0 2px rgba(59,130,246,.08);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .card{
+      border-radius:var(--radius-xl);
+      padding:22px;
+    }
+
+    .card h2{
+      margin:0 0 10px;
+      font-size:clamp(1.8rem,3vw,2.5rem);
+      line-height:1.06;
+      letter-spacing:-.03em;
+    }
+
+    .lead{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:1.06rem;
+    }
+
+    .field{
+      display:grid;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .field label{
+      font-weight:700;
+      color:#dfe7f5;
+      font-size:1rem;
+    }
+
+    .field input{
+      width:100%;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(4,10,22,.7);
+      color:var(--text);
+      padding:16px 18px;
+      font-size:1rem;
+      outline:none;
+      transition:.18s ease;
+    }
+
+    .field input:focus{
+      border-color:rgba(59,130,246,.65);
+      box-shadow:0 0 0 4px rgba(59,130,246,.12);
+    }
+
+    .stack{
+      display:grid;
+      gap:12px;
+    }
+
+    .dev-box{
+      margin-top:16px;
+      border-radius:22px;
+      border:1px dashed rgba(255,255,255,.15);
+      padding:16px;
+      background:rgba(255,255,255,.03);
+    }
+
+    .dev-box h3{
+      margin:0 0 8px;
+      font-size:1.2rem;
+      line-height:1.15;
+    }
+
+    .small{
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.08);
+      margin:16px 0;
+    }
+
+    .discover{
+      border-radius:var(--radius-xl);
+      padding:24px;
+      margin-top:4px;
+    }
+
+    .discover-head{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .discover-eye{
+      width:84px;
+      height:84px;
+      border-radius:24px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      flex-shrink:0;
+      cursor:pointer;
+    }
+
+    .discover-eye::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at center, rgba(59,130,246,.18), transparent 60%);
+    }
+
+    .discover-eye::after{
+      content:"";
+      position:absolute;
+      width:120%;
+      height:22%;
+      background:rgba(255,255,255,.10);
+      top:18%;
+      left:-10%;
+      border-radius:999px;
+      transform-origin:center;
+      animation:dtcBlink 5.8s infinite ease-in-out;
+      pointer-events:none;
+    }
+
+    .discover-eye span{
+      position:relative;
+      z-index:2;
+      font-weight:800;
+      letter-spacing:.08em;
+    }
+
+    .discover-copy h2{
+      margin:0 0 6px;
+      font-size:clamp(1.8rem,3vw,2.5rem);
+      line-height:1.05;
+      letter-spacing:-.03em;
+    }
+
+    .discover-copy p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      max-width:880px;
+    }
+
+    .discover-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .discover-card{
+      border-radius:22px;
+      padding:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.09);
+    }
+
+    .discover-card h3{
+      margin:0 0 10px;
+      font-size:1.24rem;
+    }
+
+    .discover-card p,
+    .discover-card ul{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .discover-card ul{
+      padding-left:18px;
+    }
+
+    .discover-footer{
+      margin-top:20px;
+      padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+
+    .discover-footer p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .discover-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .msg{
+      min-height:22px;
+      margin:8px 0 0;
+      color:#d8e4ff;
+      font-weight:600;
+    }
+
+    .footer-note{
+      color:var(--muted);
+      line-height:1.55;
+      margin-top:8px;
+      font-size:.98rem;
+    }
+
+    @media (max-width: 980px){
+      .grid,
+      .discover-grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        grid-template-columns:84px 1fr;
+      }
+
+      .hero-actions{
+        grid-column:1 / -1;
+        justify-content:flex-start;
+      }
+    }
+
+    @media (max-width: 640px){
+      body{
+        padding:16px 12px 28px;
+      }
+
+      .hero{
+        padding:16px;
+        gap:14px;
+        grid-template-columns:64px 1fr;
+      }
+
+      .dtc-home,
+      .discover-eye{
+        width:64px;
+        height:64px;
+        border-radius:20px;
+      }
+
+      .card,
+      .discover{
+        padding:18px;
+      }
+
+      .discover-actions,
+      .hero-actions{
+        display:grid;
+        grid-template-columns:1fr;
+      }
+
+      .btn{
+        width:100%;
+      }
+    }
+  </style>
+
+  <main class="lobby-page">
+    <section class="hero glass">
+      <a class="dtc-home" id="dtcHomeBtn" href="/index.html" title="DTC">
+        <span>DTC</span>
+      </a>
+
+      <div class="hero-copy">
+        <h1>DTC — Lobby</h1>
+        <p>Entrar, crear cuenta, recuperar acceso o descubrir el ecosistema DTC.</p>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" id="goAccessBtn" href="/kiosk.html">Acceso inteligente</a>
+        <button class="btn" id="goDiscoverTopBtn" type="button">Conoce DTC</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card glass">
+        <h2>Entrar</h2>
+        <p class="lead">Acceso seguro al sistema.</p>
+
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="tu@email.com" />
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="••••••••" />
+        </div>
+
+        <div class="stack">
+          <button class="btn btn-primary" id="signInBtn" type="button">Sign In</button>
+          <button class="btn" id="magicLinkBtn" type="button">Enviar Magic Link (sin password)</button>
+        </div>
+
+        <p class="msg" id="loginMsg"></p>
+
+        <div class="dev-box">
+          <h3>Modo Dev — Configurar Supabase</h3>
+          <p class="small">
+            El Lobby necesita la URL y la ANON KEY para registrar y entrar usuarios.
+          </p>
+
+          <div class="field">
+            <label for="supabaseUrl">Supabase URL</label>
+            <input id="supabaseUrl" type="text" placeholder="https://xxxx.supabase.co" />
+          </div>
+
+          <div class="field">
+            <label for="supabaseAnon">Anon Key</label>
+            <input id="supabaseAnon" type="text" placeholder="eyJhbGciOi..." />
+          </div>
+
+          <button class="btn btn-primary" id="saveConfigBtn" type="button">Guardar Config</button>
+          <p class="msg" id="configMsg"></p>
+        </div>
+      </article>
+
+      <article class="card glass">
+        <h2>Crear cuenta</h2>
+        <p class="lead">Nuevos usuarios.</p>
+
+        <div class="field">
+          <label for="signupName">Nombre completo</label>
+          <input id="signupName" type="text" placeholder="Felencho" />
+        </div>
+
+        <div class="field">
+          <label for="signupEmail">Email</label>
+          <input id="signupEmail" type="email" placeholder="nuevo@email.com" />
+        </div>
+
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <input id="signupPassword" type="password" placeholder="mínimo 6 caracteres" />
+        </div>
+
+        <button class="btn btn-primary" id="createAccountBtn" type="button">Create Account</button>
+        <p class="msg" id="signupMsg"></p>
+
+        <div class="divider"></div>
+
+        <h2 style="font-size:2rem;">Recuperar acceso</h2>
+        <p class="lead">Forgot username or password.</p>
+
+        <div class="field">
+          <label for="recoverEmail">Email</label>
+          <input id="recoverEmail" type="email" placeholder="tu@email.com" />
+        </div>
+
+        <button class="btn" id="recoverBtn" type="button">Enviar recuperación</button>
+        <p class="msg" id="recoverMsg"></p>
+
+        <p class="footer-note">
+          Nota: al registrarte, DTC crea tu usuario en Auth. El perfil y permisos se conectarán con tu organización y tu rol.
+        </p>
+      </article>
+    </section>
+
+    <section class="discover glass" id="discoverDTCSection">
+      <div class="discover-head">
+        <div class="discover-eye" id="discoverEyeBtn" title="DTC">
+          <span>DTC</span>
+        </div>
+
+        <div class="discover-copy">
+          <h2>Conoce DTC</h2>
+          <p>
+            Tecnología inteligente para negocios reales. Descubre nuestro sistema actual para
+            <strong>DTC Daycares Control Total</strong> y las próximas soluciones del ecosistema.
+          </p>
+        </div>
+      </div>
+
+      <div class="discover-grid">
+        <article class="discover-card">
+          <h3>DTC Daycares Control Total</h3>
+          <p>
+            Control de acceso, empleados, niños, horarios, reportes, inventario, recordatorios
+            y comunicación con padres desde una sola plataforma.
+          </p>
+          <button class="btn btn-primary" id="btnExploreDaycare" type="button">Explorar DTC</button>
+        </article>
+
+        <article class="discover-card">
+          <h3>Muy pronto</h3>
+          <ul>
+            <li>Radio &amp; TV Streaming Server</li>
+            <li>DTC Barbershop</li>
+          </ul>
+          <button class="btn" id="btnWatchDemo" type="button">Ver demostración</button>
+        </article>
+      </div>
+
+      <div class="discover-footer">
+        <p>
+          ¿No estás en DTC todavía? Esta es tu puerta para conocernos y descubrir cómo funciona
+          nuestro ecosistema.
+        </p>
+
+        <div class="discover-actions">
+          <button class="btn btn-primary" id="btnConoceDTC" type="button">Conoce DTC</button>
+          <button class="btn" id="btnBackLobby" type="button">Ir al Lobby</button>
+          <button class="btn" id="btnOtherMethod" type="button">Otro método</button>
+        </div>
+      </div>
+    </section>
+  </main>
 `;
 
-function mount() {
-  root.innerHTML = `
-    <style>${css}</style>
-
-    <div class="wrap">
-      <div class="card hero">
-        <div class="logo">◆</div>
-        <div>
-          <h1 class="title">DTC — Lobby</h1>
-          <div class="sub">Entrar, crear cuenta o recuperar acceso.</div>
-        </div>
-      </div>
-
-      <div class="grid">
-        <div class="card pane">
-          <h2 class="h2">Entrar</h2>
-          <div class="mut">Acceso seguro al sistema.</div>
-
-          <label>Email</label>
-          <input id="login-email" type="email" placeholder="tu@email.com" />
-
-          <label>Password</label>
-          <input id="login-password" type="password" placeholder="••••••••" />
-
-          <button id="btn-login" class="btn primary">Sign In</button>
-          <button id="btn-magic" class="btn">Enviar Magic Link (sin password)</button>
-
-          <div class="config">
-            <div style="font-weight:900;font-size:18px;margin-bottom:8px;">Modo Dev — Configurar Supabase</div>
-            <div class="mut2">El Lobby necesita la URL y la ANON KEY para registrar y entrar usuarios.</div>
-
-            <label>Supabase URL</label>
-            <input id="cfg-url" type="text" placeholder="https://xxxx.supabase.co" />
-
-            <label>Anon Key</label>
-            <input id="cfg-anon" type="text" placeholder="eyJhbGciOi..." />
-
-            <button id="btn-save-config" class="btn primary">Guardar Config</button>
-          </div>
-        </div>
-
-        <div class="card pane">
-          <h2 class="h2">Crear cuenta</h2>
-          <div class="mut">Nuevos usuarios</div>
-
-          <label>Nombre completo</label>
-          <input id="signup-name" type="text" placeholder="Felencho" />
-
-          <label>Email</label>
-          <input id="signup-email" type="email" placeholder="nuevo@email.com" />
-
-          <label>Password</label>
-          <input id="signup-password" type="password" placeholder="mínimo 6 caracteres" />
-
-          <button id="btn-signup" class="btn primary">Create Account</button>
-
-          <hr class="divider" />
-
-          <h2 class="h2" style="margin-top:0;">Recuperar acceso</h2>
-          <div class="mut">Forgot username or password</div>
-
-          <label>Email</label>
-          <input id="recover-email" type="email" placeholder="tu@email.com" />
-
-          <button id="btn-recover" class="btn">Enviar recuperación</button>
-
-          <div class="note">
-            Nota: al registrarte, DTC crea tu usuario en Auth. El perfil en
-            <b>profiles</b> lo crea automáticamente el trigger.
-            <br/>
-            Tip del edificio: el Lobby es para entrar; los residentes luego pasan por kiosco o paneles.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="toast" class="toast">
-      <div id="toast-dot" class="dot"></div>
-      <div>
-        <div id="toast-title" class="toast-title">Lobby</div>
-        <div id="toast-msg" class="toast-msg">Listo</div>
-      </div>
-      <button id="toast-ok">OK</button>
-    </div>
-  `;
+function goLobby() {
+  window.location.href = "/index.html";
 }
 
-function toast(title, msg, ok = true) {
-  const el = document.getElementById("toast");
-  document.getElementById("toast-title").textContent = title;
-  document.getElementById("toast-msg").textContent = msg;
-  document.getElementById("toast-dot").className = ok ? "dot" : "dot bad";
-  el.style.display = "flex";
+function goAccess() {
+  window.location.href = "/kiosk.html";
 }
 
-function bind() {
-  document.getElementById("toast-ok").addEventListener("click", () => {
-    document.getElementById("toast").style.display = "none";
-  });
-
-  document.getElementById("btn-save-config").addEventListener("click", async () => {
-    const url = document.getElementById("cfg-url").value.trim();
-    const anon = document.getElementById("cfg-anon").value.trim();
-
-    if (!url || !anon) {
-      toast("Lobby", "Falta URL o Anon Key.", false);
-      return;
-    }
-
-    localStorage.setItem("https://mugufzwvwteoopjdrheq.supabase.co", url);
-    localStorage.setItem("sb_publishable_npn2NhS9fEHAjWHGsbLTSQ_KudyqrFt", anon);
-    toast("Lobby", "Configuración Supabase guardada.");
-  });
-
-  document.getElementById("btn-signup").addEventListener("click", handleSignup);
-  document.getElementById("btn-login").addEventListener("click", handleLogin);
-  document.getElementById("btn-magic").addEventListener("click", handleMagicLink);
-  document.getElementById("btn-recover").addEventListener("click", handleRecover);
+function goDemo() {
+  window.location.href = "/demo.html";
 }
 
-async function handleSignup() {
-  try {
-    if (!hasSupabaseConfig()) {
-      toast("Crear cuenta", "Configura Supabase primero.", false);
-      return;
-    }
-
-    const fullName = document.getElementById("signup-name").value.trim();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value.trim();
-
-    if (!fullName || !email || !password) {
-      toast("Crear cuenta", "Completa nombre, email y password.", false);
-      return;
-    }
-
-    if (password.length < 6) {
-      toast("Crear cuenta", "El password debe tener al menos 6 caracteres.", false);
-      return;
-    }
-
-    const client = supabase();
-
-    const { data, error } = await client.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName
-        }
-      }
-    });
-
-    if (error) {
-      toast("Crear cuenta", error.message, false);
-      return;
-    }
-
-    toast(
-      "Crear cuenta",
-      data?.user
-        ? "Cuenta creada. Revisa tu email si tu proyecto exige confirmación."
-        : "Solicitud enviada. Revisa tu email."
-    );
-  } catch (err) {
-    toast("Crear cuenta", err.message || String(err), false);
-  }
+function goDaycareDemo() {
+  window.location.href = "/demo.html?product=daycare";
 }
 
-async function handleLogin() {
-  try {
-    if (!hasSupabaseConfig()) {
-      toast("Login", "Configura Supabase primero.", false);
-      return;
-    }
+document.getElementById("dtcHomeBtn")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  goLobby();
+});
 
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value.trim();
+document.getElementById("goDiscoverTopBtn")?.addEventListener("click", () => {
+  document.getElementById("discoverDTCSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
-    if (!email || !password) {
-      toast("Login", "Completa email y password.", false);
-      return;
-    }
+document.getElementById("discoverEyeBtn")?.addEventListener("click", goDemo);
+document.getElementById("btnConoceDTC")?.addEventListener("click", goDemo);
+document.getElementById("btnExploreDaycare")?.addEventListener("click", goDaycareDemo);
+document.getElementById("btnWatchDemo")?.addEventListener("click", goDemo);
+document.getElementById("btnBackLobby")?.addEventListener("click", goLobby);
+document.getElementById("btnOtherMethod")?.addEventListener("click", goAccess);
 
-    const client = supabase();
-    const { error } = await client.auth.signInWithPassword({ email, password });
+// Placeholders visuales por ahora
+document.getElementById("signInBtn")?.addEventListener("click", () => {
+  document.getElementById("loginMsg").textContent = "Próximo paso: conectar login real con Supabase Auth.";
+});
 
-    if (error) {
-      toast("Login", error.message, false);
-      return;
-    }
+document.getElementById("magicLinkBtn")?.addEventListener("click", () => {
+  document.getElementById("loginMsg").textContent = "Próximo paso: enviar Magic Link real.";
+});
 
-    toast("Login", "Sesión iniciada. Entrando al edificio...");
-    setTimeout(() => {
-      window.location.href = "./app.html";
-    }, 800);
-  } catch (err) {
-    toast("Login", err.message || String(err), false);
-  }
-}
+document.getElementById("createAccountBtn")?.addEventListener("click", () => {
+  document.getElementById("signupMsg").textContent = "Próximo paso: crear cuenta real con Supabase.";
+});
 
-async function handleMagicLink() {
-  try {
-    if (!hasSupabaseConfig()) {
-      toast("Magic Link", "Configura Supabase primero.", false);
-      return;
-    }
+document.getElementById("recoverBtn")?.addEventListener("click", () => {
+  document.getElementById("recoverMsg").textContent = "Próximo paso: recuperación real de acceso.";
+});
 
-    const email = document.getElementById("login-email").value.trim();
-
-    if (!email) {
-      toast("Magic Link", "Escribe tu email.", false);
-      return;
-    }
-
-    const client = supabase();
-    const { error } = await client.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin + "/app.html"
-      }
-    });
-
-    if (error) {
-      toast("Magic Link", error.message, false);
-      return;
-    }
-
-    toast("Magic Link", "Te enviamos un enlace de acceso.");
-  } catch (err) {
-    toast("Magic Link", err.message || String(err), false);
-  }
-}
-
-async function handleRecover() {
-  try {
-    if (!hasSupabaseConfig()) {
-      toast("Recuperación", "Configura Supabase primero.", false);
-      return;
-    }
-
-    const email = document.getElementById("recover-email").value.trim();
-
-    if (!email) {
-      toast("Recuperación", "Escribe tu email.", false);
-      return;
-    }
-
-    const client = supabase();
-    const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/index.html"
-    });
-
-    if (error) {
-      toast("Recuperación", error.message, false);
-      return;
-    }
-
-    toast("Recuperación", "Te enviamos el correo de recuperación.");
-  } catch (err) {
-    toast("Recuperación", err.message || String(err), false);
-  }
-}
-
-mount();
-bind();
+document.getElementById("saveConfigBtn")?.addEventListener("click", () => {
+  document.getElementById("configMsg").textContent = "Próximo paso: guardar configuración local de Supabase.";
+});
