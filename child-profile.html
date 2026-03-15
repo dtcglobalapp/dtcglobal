@@ -13,6 +13,7 @@
       --text: #f3f6fb;
       --muted: #b3bfd3;
       --accent: #3b82f6;
+      --accent-soft: rgba(59,130,246,.16);
       --shadow: 0 18px 48px rgba(0,0,0,.34);
       --radius-xl: 28px;
       --radius-lg: 20px;
@@ -37,7 +38,7 @@
     }
 
     .page {
-      width: min(100%, 1100px);
+      width: min(100%, 1180px);
       margin: 0 auto;
       display: grid;
       gap: 18px;
@@ -58,15 +59,15 @@
 
     .hero {
       display: grid;
-      grid-template-columns: 90px 1fr;
+      grid-template-columns: 96px 1fr;
       gap: 18px;
       align-items: center;
     }
 
     .avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 26px;
+      width: 96px;
+      height: 96px;
+      border-radius: 28px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.1);
       display: flex;
@@ -75,9 +76,19 @@
       font-size: 2rem;
       font-weight: 800;
       color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
     }
 
-    h1, h2, h3, p {
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    h1, h2, h3, h4, p {
       margin: 0;
     }
 
@@ -93,9 +104,58 @@
       font-size: 1.05rem;
     }
 
+    .tabs-wrap {
+      border-radius: var(--radius-xl);
+      padding: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px 15px;
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+    }
+
+    .tab-btn.active {
+      border-color: rgba(59,130,246,.55);
+      background: rgba(59,130,246,.14);
+      box-shadow:
+        inset 0 0 0 1px rgba(59,130,246,.22),
+        0 0 0 2px rgba(59,130,246,.08);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 18px;
+    }
+
+    .stack-grid {
+      display: grid;
       gap: 18px;
     }
 
@@ -126,52 +186,54 @@
     .value {
       font-size: 1rem;
       font-weight: 600;
+      line-height: 1.45;
     }
 
-    .memories {
+    .list {
       display: grid;
       gap: 12px;
     }
 
-    .memory {
+    .list-card {
       border-radius: var(--radius-lg);
       padding: 16px;
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.08);
     }
 
-    .memory-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: start;
-      margin-bottom: 8px;
-    }
-
-    .memory h3 {
+    .list-card h3 {
       font-size: 1.08rem;
+      margin-bottom: 6px;
     }
 
-    .tag {
+    .list-meta {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .pill {
       padding: 6px 10px;
       border-radius: 999px;
       background: rgba(59,130,246,.16);
       border: 1px solid rgba(59,130,246,.28);
       font-size: .82rem;
       color: #dbeafe;
-      white-space: nowrap;
     }
 
-    .memory p {
+    .pill.muted {
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.10);
       color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .memory small {
-      display: block;
-      margin-top: 10px;
-      color: #d8e4ff;
-      opacity: .8;
     }
 
     .actions {
@@ -179,6 +241,7 @@
       gap: 12px;
       flex-wrap: wrap;
       margin-top: 8px;
+      margin-bottom: 10px;
     }
 
     .btn {
@@ -194,6 +257,12 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      transition: .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
     }
 
     .btn-primary {
@@ -208,20 +277,135 @@
       color: #d8e4ff;
       font-weight: 600;
       margin-top: 10px;
+      margin-bottom: 8px;
     }
 
-    @media (max-width: 860px) {
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 18px;
+      margin-top: 10px;
+      padding-left: 14px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(
+        180deg,
+        rgba(59,130,246,.55),
+        rgba(255,255,255,.08)
+      );
+      border-radius: 999px;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(59,130,246,.18);
+      border: 2px solid rgba(59,130,246,.58);
+      box-shadow: 0 0 0 4px rgba(59,130,246,.08);
+    }
+
+    .timeline-card {
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .timeline-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 8px;
+    }
+
+    .timeline-card h3 {
+      font-size: 1.08rem;
+      line-height: 1.25;
+    }
+
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(59,130,246,.16);
+      border: 1px solid rgba(59,130,246,.28);
+      font-size: .82rem;
+      color: #dbeafe;
+      white-space: nowrap;
+      text-transform: lowercase;
+    }
+
+    .timeline-card p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 2px;
+    }
+
+    .timeline-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .timeline-date {
+      color: #d8e4ff;
+      opacity: .85;
+      font-size: .92rem;
+      font-weight: 600;
+    }
+
+    .timeline-type {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .empty-state {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px dashed rgba(255,255,255,.12);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 980px) {
       .grid {
         grid-template-columns: 1fr;
       }
+    }
+
+    @media (max-width: 860px) {
       .hero {
-        grid-template-columns: 70px 1fr;
+        grid-template-columns: 74px 1fr;
       }
+
       .avatar {
-        width: 70px;
-        height: 70px;
-        border-radius: 20px;
-        font-size: 1.5rem;
+        width: 74px;
+        height: 74px;
+        border-radius: 22px;
+        font-size: 1.55rem;
       }
     }
   </style>
@@ -236,8 +420,19 @@
       </div>
     </section>
 
-    <section class="grid">
-      <article class="card glass">
+    <section class="tabs-wrap glass">
+      <div class="tabs" id="tabsNav">
+        <button class="tab-btn active" data-tab="info">Información</button>
+        <button class="tab-btn" data-tab="guardians">Guardianes</button>
+        <button class="tab-btn" data-tab="emergency">Emergencia</button>
+        <button class="tab-btn" data-tab="pickup">Recogida</button>
+        <button class="tab-btn" data-tab="health">Salud</button>
+        <button class="tab-btn" data-tab="timeline">Timeline</button>
+      </div>
+    </section>
+
+    <section class="panel active" id="panel-info">
+      <section class="card glass">
         <h2>Información</h2>
         <div class="info-list">
           <div class="info-item">
@@ -261,16 +456,87 @@
             <div class="value" id="childEnrollment">—</div>
           </div>
         </div>
-      </article>
+      </section>
+    </section>
 
-      <article class="card glass">
-        <h2>Memorias</h2>
+    <section class="panel" id="panel-guardians">
+      <section class="card glass">
+        <h2>Guardianes</h2>
+        <div class="list" id="guardiansList"></div>
+      </section>
+    </section>
+
+    <section class="panel" id="panel-emergency">
+      <section class="card glass">
+        <h2>Contactos de emergencia</h2>
+        <div class="list" id="emergencyList"></div>
+      </section>
+    </section>
+
+    <section class="panel" id="panel-pickup">
+      <section class="card glass">
+        <h2>Personas autorizadas para recoger</h2>
+        <div class="list" id="pickupList"></div>
+      </section>
+    </section>
+
+    <section class="panel" id="panel-health">
+      <section class="card glass">
+        <h2>Salud</h2>
+        <div class="stack-grid">
+          <div class="info-item">
+            <div class="label">Pediatra principal</div>
+            <div class="value" id="medPhysician">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Teléfono del pediatra</div>
+            <div class="value" id="medPhysicianPhone">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Hospital preferido</div>
+            <div class="value" id="medHospital">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Teléfono del hospital</div>
+            <div class="value" id="medHospitalPhone">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Consentimiento médico de emergencia</div>
+            <div class="value" id="medEmergencyConsent">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Resumen de alergias</div>
+            <div class="value" id="medAllergySummary">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Hospitalizaciones / enfermedades</div>
+            <div class="value" id="medHospitalizations">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Condiciones crónicas</div>
+            <div class="value" id="medChronic">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Condiciones especiales</div>
+            <div class="value" id="medSpecial">—</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Notas</div>
+            <div class="value" id="medNotes">—</div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="panel" id="panel-timeline">
+      <section class="card glass">
+        <h2>Timeline del niño</h2>
         <div class="actions">
           <button class="btn btn-primary" id="addMemoryBtn">Agregar memoria</button>
         </div>
         <p class="status" id="memoryStatus"></p>
-        <div class="memories" id="memoriesList"></div>
-      </article>
+        <div class="timeline" id="memoriesList"></div>
+      </section>
     </section>
   </main>
 
@@ -288,9 +554,82 @@
     const childAllergies = document.getElementById("childAllergies");
     const childMedical = document.getElementById("childMedical");
     const childEnrollment = document.getElementById("childEnrollment");
+
+    const guardiansList = document.getElementById("guardiansList");
+    const emergencyList = document.getElementById("emergencyList");
+    const pickupList = document.getElementById("pickupList");
+
+    const medPhysician = document.getElementById("medPhysician");
+    const medPhysicianPhone = document.getElementById("medPhysicianPhone");
+    const medHospital = document.getElementById("medHospital");
+    const medHospitalPhone = document.getElementById("medHospitalPhone");
+    const medEmergencyConsent = document.getElementById("medEmergencyConsent");
+    const medAllergySummary = document.getElementById("medAllergySummary");
+    const medHospitalizations = document.getElementById("medHospitalizations");
+    const medChronic = document.getElementById("medChronic");
+    const medSpecial = document.getElementById("medSpecial");
+    const medNotes = document.getElementById("medNotes");
+
     const memoriesList = document.getElementById("memoriesList");
     const memoryStatus = document.getElementById("memoryStatus");
     const addMemoryBtn = document.getElementById("addMemoryBtn");
+
+    function formatDate(value) {
+      if (!value) return "—";
+      try {
+        return new Date(value).toLocaleDateString("es-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric"
+        });
+      } catch {
+        return value;
+      }
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "—";
+      try {
+        return new Date(value).toLocaleString("es-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit"
+        });
+      } catch {
+        return value;
+      }
+    }
+
+    function yesNo(value) {
+      if (value === true) return "Sí";
+      if (value === false) return "No";
+      return "—";
+    }
+
+    function setListEmpty(el, text) {
+      el.innerHTML = `<div class="empty-state">${text}</div>`;
+    }
+
+    function activateTab(tab) {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+
+      document.querySelectorAll(".panel").forEach(panel => {
+        panel.classList.remove("active");
+      });
+
+      const target = document.getElementById(`panel-${tab}`);
+      if (target) target.classList.add("active");
+    }
+
+    document.getElementById("tabsNav")?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab-btn");
+      if (!btn) return;
+      activateTab(btn.dataset.tab);
+    });
 
     async function loadChildProfile() {
       const db = supabase();
@@ -314,14 +653,180 @@
         "Niño";
 
       childName.textContent = fullName;
-      childSubtitle.textContent = "Perfil central del niño en DTC";
-      childAvatar.textContent = (fullName || "N").charAt(0).toUpperCase();
+      childSubtitle.textContent = "Centro de control del niño en DTC";
 
-      childDob.textContent = data.date_of_birth || "—";
+      if (data.profile_photo_url) {
+        childAvatar.innerHTML = `<img src="${data.profile_photo_url}" alt="${fullName}" />`;
+      } else {
+        childAvatar.textContent = (fullName || "N").charAt(0).toUpperCase();
+      }
+
+      childDob.textContent = formatDate(data.date_of_birth);
       childClassroom.textContent = data.classroom || "—";
       childAllergies.textContent = data.allergies || "Sin registro";
       childMedical.textContent = data.medical_notes || "Sin notas";
-      childEnrollment.textContent = data.enrollment_date || "—";
+      childEnrollment.textContent = formatDate(data.enrollment_date);
+    }
+
+    async function loadGuardians() {
+      const db = supabase();
+
+      const { data, error } = await db
+        .from("child_guardians")
+        .select("*")
+        .eq("organization_id", ORGANIZATION_ID)
+        .eq("child_id", CHILD_ID)
+        .order("is_primary", { ascending: false });
+
+      if (error) {
+        setListEmpty(guardiansList, error.message || "No se pudieron cargar los guardianes.");
+        return;
+      }
+
+      const rows = data || [];
+
+      if (!rows.length) {
+        setListEmpty(guardiansList, "No hay guardianes registrados.");
+        return;
+      }
+
+      guardiansList.innerHTML = rows.map(row => `
+        <article class="list-card">
+          <h3>${row.full_name}</h3>
+          <div class="list-meta">
+            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+            <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
+            <div><strong>Email:</strong> ${row.email || "—"}</div>
+            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+          </div>
+          <div class="pill-row">
+            ${row.is_primary ? `<span class="pill">Principal</span>` : ""}
+            ${row.is_legal_responsible ? `<span class="pill">Responsable legal</span>` : ""}
+            <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function loadEmergencyContacts() {
+      const db = supabase();
+
+      const { data, error } = await db
+        .from("child_emergency_contacts")
+        .select("*")
+        .eq("organization_id", ORGANIZATION_ID)
+        .eq("child_id", CHILD_ID)
+        .order("priority_order", { ascending: true });
+
+      if (error) {
+        setListEmpty(emergencyList, error.message || "No se pudieron cargar los contactos de emergencia.");
+        return;
+      }
+
+      const rows = data || [];
+
+      if (!rows.length) {
+        setListEmpty(emergencyList, "No hay contactos de emergencia registrados.");
+        return;
+      }
+
+      emergencyList.innerHTML = rows.map(row => `
+        <article class="list-card">
+          <h3>${row.full_name}</h3>
+          <div class="list-meta">
+            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+            <div><strong>Teléfono principal:</strong> ${row.phone || "—"}</div>
+            <div><strong>Teléfono alterno:</strong> ${row.alt_phone || "—"}</div>
+            <div><strong>Email:</strong> ${row.email || "—"}</div>
+            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+            <div><strong>Prioridad:</strong> ${row.priority_order ?? "—"}</div>
+            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+          </div>
+          <div class="pill-row">
+            <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function loadPickupAuthorizations() {
+      const db = supabase();
+
+      const { data, error } = await db
+        .from("child_pickup_authorizations")
+        .select("*")
+        .eq("organization_id", ORGANIZATION_ID)
+        .eq("child_id", CHILD_ID)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        setListEmpty(pickupList, error.message || "No se pudieron cargar las autorizaciones de recogida.");
+        return;
+      }
+
+      const rows = data || [];
+
+      if (!rows.length) {
+        setListEmpty(pickupList, "No hay personas autorizadas para recoger registradas.");
+        return;
+      }
+
+      pickupList.innerHTML = rows.map(row => `
+        <article class="list-card">
+          <h3>${row.full_name}</h3>
+          <div class="list-meta">
+            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+            <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
+            <div><strong>Email:</strong> ${row.email || "—"}</div>
+            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+            <div><strong>Fecha efectiva:</strong> ${formatDate(row.effective_date)}</div>
+            <div><strong>Expira:</strong> ${formatDate(row.expires_on)}</div>
+            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+          </div>
+          <div class="pill-row">
+            <span class="pill">${row.is_active ? "Activo" : "Inactivo"}</span>
+            <span class="pill muted">Face ID: ${yesNo(row.face_enabled)}</span>
+            <span class="pill muted">PIN: ${yesNo(row.pin_enabled)}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function loadMedical() {
+      const db = supabase();
+
+      const { data, error } = await db
+        .from("child_medical")
+        .select("*")
+        .eq("organization_id", ORGANIZATION_ID)
+        .eq("child_id", CHILD_ID)
+        .single();
+
+      if (error || !data) {
+        medPhysician.textContent = "Sin registro";
+        medPhysicianPhone.textContent = "—";
+        medHospital.textContent = "—";
+        medHospitalPhone.textContent = "—";
+        medEmergencyConsent.textContent = "—";
+        medAllergySummary.textContent = "—";
+        medHospitalizations.textContent = "—";
+        medChronic.textContent = "—";
+        medSpecial.textContent = "—";
+        medNotes.textContent = error?.message || "Sin datos médicos";
+        return;
+      }
+
+      medPhysician.textContent = data.primary_physician_name || "—";
+      medPhysicianPhone.textContent = data.primary_physician_phone || "—";
+      medHospital.textContent = data.preferred_hospital || "—";
+      medHospitalPhone.textContent = data.hospital_phone || "—";
+      medEmergencyConsent.textContent = yesNo(data.emergency_medical_consent);
+      medAllergySummary.textContent = data.child_allergies_summary || "—";
+      medHospitalizations.textContent = data.hospitalizations_and_illnesses || "—";
+      medChronic.textContent = data.chronic_conditions || "—";
+      medSpecial.textContent = data.special_health_conditions || "—";
+      medNotes.textContent = data.notes || "—";
     }
 
     async function loadMemories() {
@@ -342,18 +847,28 @@
       const rows = data || [];
 
       if (!rows.length) {
-        memoriesList.innerHTML = "<div class='memory'><p>No hay memorias guardadas todavía.</p></div>";
+        memoriesList.innerHTML = `
+          <div class="empty-state">
+            No hay memorias guardadas todavía para este niño.
+          </div>
+        `;
         return;
       }
 
       memoriesList.innerHTML = rows.map(row => `
-        <article class="memory">
-          <div class="memory-top">
-            <h3>${row.title}</h3>
-            <span class="tag">${row.memory_type}</span>
+        <article class="timeline-item">
+          <span class="timeline-dot"></span>
+          <div class="timeline-card">
+            <div class="timeline-top">
+              <h3>${row.title}</h3>
+              <span class="tag">${row.memory_type}</span>
+            </div>
+            <p>${row.description || "Sin descripción."}</p>
+            <div class="timeline-meta">
+              <span class="timeline-date">${formatDateTime(row.captured_at)}</span>
+              ${row.milestone_type ? `<span class="timeline-type">${row.milestone_type}</span>` : ""}
+            </div>
           </div>
-          <p>${row.description || "Sin descripción."}</p>
-          <small>${new Date(row.captured_at).toLocaleString()}</small>
         </article>
       `).join("");
     }
@@ -390,6 +905,10 @@
     addMemoryBtn?.addEventListener("click", addTestMemory);
 
     await loadChildProfile();
+    await loadGuardians();
+    await loadEmergencyContacts();
+    await loadPickupAuthorizations();
+    await loadMedical();
     await loadMemories();
   </script>
 </body>
