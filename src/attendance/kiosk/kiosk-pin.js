@@ -1,4 +1,4 @@
-import { supabase } from "../core/supabase.js";
+import { supabase } from "../../../core/supabase.js";
 
 const ORGANIZATION_ID = "b11a6b48-8f83-4737-8e3d-4b79a15a178c";
 

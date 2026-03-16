@@ -1,915 +1,598 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DTC — Perfil del Niño</title>
-  <style>
-    :root {
-      --bg-1: #050816;
-      --bg-2: #0a1020;
-      --card: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.12);
-      --text: #f3f6fb;
-      --muted: #b3bfd3;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59,130,246,.16);
-      --shadow: 0 18px 48px rgba(0,0,0,.34);
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 16px;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top center, rgba(59,130,246,.16), transparent 30%),
-        linear-gradient(180deg, var(--bg-2), var(--bg-1));
-    }
-
-    body {
-      padding: 20px 14px 40px;
-    }
-
-    .page {
-      width: min(100%, 1180px);
-      margin: 0 auto;
-      display: grid;
-      gap: 18px;
-    }
-
-    .glass {
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-
-    .hero, .card {
-      border-radius: var(--radius-xl);
-      padding: 22px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 96px 1fr;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 28px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    h1, h2, h3, h4, p {
-      margin: 0;
-    }
-
-    .hero h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.02;
-      letter-spacing: -.04em;
-    }
-
-    .hero p {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 1.05rem;
-    }
-
-    .tabs-wrap {
-      border-radius: var(--radius-xl);
-      padding: 14px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      appearance: none;
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      padding: 12px 15px;
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight: 700;
-      cursor: pointer;
-      transition: .18s ease;
-    }
-
-    .tab-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.08);
-    }
-
-    .tab-btn.active {
-      border-color: rgba(59,130,246,.55);
-      background: rgba(59,130,246,.14);
-      box-shadow:
-        inset 0 0 0 1px rgba(59,130,246,.22),
-        0 0 0 2px rgba(59,130,246,.08);
-    }
-
-    .panel {
-      display: none;
-    }
-
-    .panel.active {
-      display: block;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap: 18px;
-    }
-
-    .stack-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 14px;
-      letter-spacing: -.02em;
-    }
-
-    .info-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .info-item {
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.06);
-    }
-
-    .label {
-      font-size: .9rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .value {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.45;
-    }
-
-    .list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .list-card {
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .list-card h3 {
-      font-size: 1.08rem;
-      margin-bottom: 6px;
-    }
-
-    .list-meta {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: .95rem;
-      line-height: 1.5;
-    }
-
-    .pill-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(59,130,246,.16);
-      border: 1px solid rgba(59,130,246,.28);
-      font-size: .82rem;
-      color: #dbeafe;
-    }
-
-    .pill.muted {
-      background: rgba(255,255,255,.05);
-      border-color: rgba(255,255,255,.10);
-      color: var(--muted);
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      appearance: none;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      padding: 14px 18px;
-      background: rgba(255,255,255,.05);
-      color: var(--text);
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: .18s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.08);
-    }
-
-    .btn-primary {
-      border-color: rgba(59,130,246,.55);
-      box-shadow:
-        inset 0 0 0 1px rgba(59,130,246,.25),
-        0 0 0 2px rgba(59,130,246,.08);
-    }
-
-    .status {
-      min-height: 24px;
-      color: #d8e4ff;
-      font-weight: 600;
-      margin-top: 10px;
-      margin-bottom: 8px;
-    }
-
-    .timeline {
-      position: relative;
-      display: grid;
-      gap: 18px;
-      margin-top: 10px;
-      padding-left: 14px;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 9px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(
-        180deg,
-        rgba(59,130,246,.55),
-        rgba(255,255,255,.08)
-      );
-      border-radius: 999px;
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-left: 28px;
-    }
-
-    .timeline-dot {
-      position: absolute;
-      left: 0;
-      top: 12px;
-      width: 20px;
-      height: 20px;
-      border-radius: 999px;
-      background: rgba(59,130,246,.18);
-      border: 2px solid rgba(59,130,246,.58);
-      box-shadow: 0 0 0 4px rgba(59,130,246,.08);
-    }
-
-    .timeline-card {
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .timeline-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: start;
-      margin-bottom: 8px;
-    }
-
-    .timeline-card h3 {
-      font-size: 1.08rem;
-      line-height: 1.25;
-    }
-
-    .tag {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(59,130,246,.16);
-      border: 1px solid rgba(59,130,246,.28);
-      font-size: .82rem;
-      color: #dbeafe;
-      white-space: nowrap;
-      text-transform: lowercase;
-    }
-
-    .timeline-card p {
-      color: var(--muted);
-      line-height: 1.55;
-      margin-top: 2px;
-    }
-
-    .timeline-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-      align-items: center;
-    }
-
-    .timeline-date {
-      color: #d8e4ff;
-      opacity: .85;
-      font-size: .92rem;
-      font-weight: 600;
-    }
-
-    .timeline-type {
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-      color: var(--muted);
-      font-size: .82rem;
-    }
-
-    .empty-state {
-      border-radius: var(--radius-lg);
-      padding: 18px;
-      background: rgba(255,255,255,.04);
-      border: 1px dashed rgba(255,255,255,.12);
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    @media (max-width: 980px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 860px) {
-      .hero {
-        grid-template-columns: 74px 1fr;
-      }
-
-      .avatar {
-        width: 74px;
-        height: 74px;
-        border-radius: 22px;
-        font-size: 1.55rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="page">
-    <section class="hero glass">
-      <div class="avatar" id="childAvatar">E</div>
-      <div>
-        <h1 id="childName">Perfil del Niño</h1>
-        <p id="childSubtitle">Cargando información…</p>
-      </div>
-    </section>
-
-    <section class="tabs-wrap glass">
-      <div class="tabs" id="tabsNav">
-        <button class="tab-btn active" data-tab="info">Información</button>
-        <button class="tab-btn" data-tab="guardians">Guardianes</button>
-        <button class="tab-btn" data-tab="emergency">Emergencia</button>
-        <button class="tab-btn" data-tab="pickup">Recogida</button>
-        <button class="tab-btn" data-tab="health">Salud</button>
-        <button class="tab-btn" data-tab="timeline">Timeline</button>
-      </div>
-    </section>
-
-    <section class="panel active" id="panel-info">
-      <section class="card glass">
-        <h2>Información</h2>
-        <div class="info-list">
-          <div class="info-item">
-            <div class="label">Fecha de nacimiento</div>
-            <div class="value" id="childDob">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Aula</div>
-            <div class="value" id="childClassroom">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Alergias</div>
-            <div class="value" id="childAllergies">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Notas médicas</div>
-            <div class="value" id="childMedical">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Ingreso</div>
-            <div class="value" id="childEnrollment">—</div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <section class="panel" id="panel-guardians">
-      <section class="card glass">
-        <h2>Guardianes</h2>
-        <div class="list" id="guardiansList"></div>
-      </section>
-    </section>
-
-    <section class="panel" id="panel-emergency">
-      <section class="card glass">
-        <h2>Contactos de emergencia</h2>
-        <div class="list" id="emergencyList"></div>
-      </section>
-    </section>
-
-    <section class="panel" id="panel-pickup">
-      <section class="card glass">
-        <h2>Personas autorizadas para recoger</h2>
-        <div class="list" id="pickupList"></div>
-      </section>
-    </section>
-
-    <section class="panel" id="panel-health">
-      <section class="card glass">
-        <h2>Salud</h2>
-        <div class="stack-grid">
-          <div class="info-item">
-            <div class="label">Pediatra principal</div>
-            <div class="value" id="medPhysician">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Teléfono del pediatra</div>
-            <div class="value" id="medPhysicianPhone">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Hospital preferido</div>
-            <div class="value" id="medHospital">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Teléfono del hospital</div>
-            <div class="value" id="medHospitalPhone">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Consentimiento médico de emergencia</div>
-            <div class="value" id="medEmergencyConsent">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Resumen de alergias</div>
-            <div class="value" id="medAllergySummary">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Hospitalizaciones / enfermedades</div>
-            <div class="value" id="medHospitalizations">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Condiciones crónicas</div>
-            <div class="value" id="medChronic">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Condiciones especiales</div>
-            <div class="value" id="medSpecial">—</div>
-          </div>
-          <div class="info-item">
-            <div class="label">Notas</div>
-            <div class="value" id="medNotes">—</div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <section class="panel" id="panel-timeline">
-      <section class="card glass">
-        <h2>Timeline del niño</h2>
-        <div class="actions">
-          <button class="btn btn-primary" id="addMemoryBtn">Agregar memoria</button>
-        </div>
-        <p class="status" id="memoryStatus"></p>
-        <div class="timeline" id="memoriesList"></div>
-      </section>
-    </section>
-  </main>
-
-  <script type="module">
-    import { supabase } from "./core/supabase.js";
-
-    const ORGANIZATION_ID = "b11a6b48-8f83-4737-8e3d-4b79a15a178c";
-    const CHILD_ID = "1095c76d-3ab9-4960-96df-23381def3862";
-
-    const childName = document.getElementById("childName");
-    const childSubtitle = document.getElementById("childSubtitle");
-    const childAvatar = document.getElementById("childAvatar");
-    const childDob = document.getElementById("childDob");
-    const childClassroom = document.getElementById("childClassroom");
-    const childAllergies = document.getElementById("childAllergies");
-    const childMedical = document.getElementById("childMedical");
-    const childEnrollment = document.getElementById("childEnrollment");
-
-    const guardiansList = document.getElementById("guardiansList");
-    const emergencyList = document.getElementById("emergencyList");
-    const pickupList = document.getElementById("pickupList");
-
-    const medPhysician = document.getElementById("medPhysician");
-    const medPhysicianPhone = document.getElementById("medPhysicianPhone");
-    const medHospital = document.getElementById("medHospital");
-    const medHospitalPhone = document.getElementById("medHospitalPhone");
-    const medEmergencyConsent = document.getElementById("medEmergencyConsent");
-    const medAllergySummary = document.getElementById("medAllergySummary");
-    const medHospitalizations = document.getElementById("medHospitalizations");
-    const medChronic = document.getElementById("medChronic");
-    const medSpecial = document.getElementById("medSpecial");
-    const medNotes = document.getElementById("medNotes");
-
-    const memoriesList = document.getElementById("memoriesList");
-    const memoryStatus = document.getElementById("memoryStatus");
-    const addMemoryBtn = document.getElementById("addMemoryBtn");
-
-    function formatDate(value) {
-      if (!value) return "—";
-      try {
-        return new Date(value).toLocaleDateString("es-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric"
-        });
-      } catch {
-        return value;
-      }
-    }
-
-    function formatDateTime(value) {
-      if (!value) return "—";
-      try {
-        return new Date(value).toLocaleString("es-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit"
-        });
-      } catch {
-        return value;
-      }
-    }
-
-    function yesNo(value) {
-      if (value === true) return "Sí";
-      if (value === false) return "No";
-      return "—";
-    }
-
-    function setListEmpty(el, text) {
-      el.innerHTML = `<div class="empty-state">${text}</div>`;
-    }
-
-    function activateTab(tab) {
-      document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === tab);
+<script type="module">
+  import { supabase } from "./core/supabase.js";
+  import { initChildProfileDaily } from "./src/child-profile-daily.js";
+
+  const ORGANIZATION_ID = "b11a6b48-8f83-4737-8e3d-4b79a15a178c";
+  const CHILD_ID = "1095c76d-3ab9-4960-96df-23381def3862";
+
+  const childName = document.getElementById("childName");
+  const childSubtitle = document.getElementById("childSubtitle");
+  const childAvatar = document.getElementById("childAvatar");
+  const childDob = document.getElementById("childDob");
+  const childClassroom = document.getElementById("childClassroom");
+  const childAllergies = document.getElementById("childAllergies");
+  const childMedical = document.getElementById("childMedical");
+  const childEnrollment = document.getElementById("childEnrollment");
+
+  const guardiansList = document.getElementById("guardiansList");
+  const emergencyList = document.getElementById("emergencyList");
+  const pickupList = document.getElementById("pickupList");
+  const consentsList = document.getElementById("consentsList");
+  const documentsList = document.getElementById("documentsList");
+
+  const medPhysician = document.getElementById("medPhysician");
+  const medPhysicianPhone = document.getElementById("medPhysicianPhone");
+  const medHospital = document.getElementById("medHospital");
+  const medHospitalPhone = document.getElementById("medHospitalPhone");
+  const medEmergencyConsent = document.getElementById("medEmergencyConsent");
+  const medAllergySummary = document.getElementById("medAllergySummary");
+  const medHospitalizations = document.getElementById("medHospitalizations");
+  const medChronic = document.getElementById("medChronic");
+  const medSpecial = document.getElementById("medSpecial");
+  const medNotes = document.getElementById("medNotes");
+
+  const sleepNapArea = document.getElementById("sleepNapArea");
+  const sleepNapSurface = document.getElementById("sleepNapSurface");
+  const sleepNapSupervision = document.getElementById("sleepNapSupervision");
+  const sleepNightArea = document.getElementById("sleepNightArea");
+  const sleepNightSurface = document.getElementById("sleepNightSurface");
+  const sleepNightSupervision = document.getElementById("sleepNightSupervision");
+  const sleepParentSigned = document.getElementById("sleepParentSigned");
+  const sleepProviderSigned = document.getElementById("sleepProviderSigned");
+  const sleepFormVersion = document.getElementById("sleepFormVersion");
+  const sleepNotes = document.getElementById("sleepNotes");
+
+  const feedingCacfp = document.getElementById("feedingCacfp");
+  const feedingFormula = document.getElementById("feedingFormula");
+  const feedingFormulaProvider = document.getElementById("feedingFormulaProvider");
+  const feedingSolidProvider = document.getElementById("feedingSolidProvider");
+  const feedingScheduleType = document.getElementById("feedingScheduleType");
+  const feedingScheduleNotes = document.getElementById("feedingScheduleNotes");
+  const feedingParentSigned = document.getElementById("feedingParentSigned");
+  const feedingProviderSigned = document.getElementById("feedingProviderSigned");
+  const feedingFormVersion = document.getElementById("feedingFormVersion");
+  const feedingNotes = document.getElementById("feedingNotes");
+
+  const transportAllowed = document.getElementById("transportAllowed");
+  const transportInformed = document.getElementById("transportInformed");
+  const transportBy = document.getElementById("transportBy");
+  const transportScheduleType = document.getElementById("transportScheduleType");
+  const transportScheduleNotes = document.getElementById("transportScheduleNotes");
+  const transportParentName = document.getElementById("transportParentName");
+  const transportParentSigned = document.getElementById("transportParentSigned");
+  const transportFormVersion = document.getElementById("transportFormVersion");
+  const transportNotes = document.getElementById("transportNotes");
+
+  const memoriesList = document.getElementById("memoriesList");
+  const memoryStatus = document.getElementById("memoryStatus");
+  const addMemoryBtn = document.getElementById("addMemoryBtn");
+
+  function formatDate(value) {
+    if (!value) return "—";
+    try {
+      return new Date(value).toLocaleDateString("es-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
       });
-
-      document.querySelectorAll(".panel").forEach(panel => {
-        panel.classList.remove("active");
-      });
-
-      const target = document.getElementById(`panel-${tab}`);
-      if (target) target.classList.add("active");
+    } catch {
+      return value;
     }
+  }
 
-    document.getElementById("tabsNav")?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".tab-btn");
-      if (!btn) return;
-      activateTab(btn.dataset.tab);
+  function formatDateTime(value) {
+    if (!value) return "—";
+    try {
+      return new Date(value).toLocaleString("es-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    } catch {
+      return value;
+    }
+  }
+
+  function yesNo(value) {
+    if (value === true) return "Sí";
+    if (value === false) return "No";
+    return "—";
+  }
+
+  function prettyEnum(value) {
+    if (!value) return "—";
+    return String(value)
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function setListEmpty(el, text) {
+    el.innerHTML = `<div class="empty-state">${text}</div>`;
+  }
+
+  function activateTab(tab) {
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === tab);
     });
 
-    async function loadChildProfile() {
-      const db = supabase();
+    document.querySelectorAll(".panel").forEach(panel => {
+      panel.classList.remove("active");
+    });
 
-      const { data, error } = await db
-        .from("children")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("id", CHILD_ID)
-        .single();
+    const target = document.getElementById(`panel-${tab}`);
+    if (target) target.classList.add("active");
+  }
 
-      if (error || !data) {
-        childName.textContent = "No se pudo cargar el perfil";
-        childSubtitle.textContent = error?.message || "Perfil no encontrado";
-        return;
-      }
+  document.getElementById("tabsNav")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn) return;
+    activateTab(btn.dataset.tab);
+  });
 
-      const fullName =
-        data.full_name ||
-        [data.first_name, data.last_name].filter(Boolean).join(" ") ||
-        "Niño";
+  async function loadChildProfile() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("children")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("id", CHILD_ID)
+      .single();
 
-      childName.textContent = fullName;
-      childSubtitle.textContent = "Centro de control del niño en DTC";
-
-      if (data.profile_photo_url) {
-        childAvatar.innerHTML = `<img src="${data.profile_photo_url}" alt="${fullName}" />`;
-      } else {
-        childAvatar.textContent = (fullName || "N").charAt(0).toUpperCase();
-      }
-
-      childDob.textContent = formatDate(data.date_of_birth);
-      childClassroom.textContent = data.classroom || "—";
-      childAllergies.textContent = data.allergies || "Sin registro";
-      childMedical.textContent = data.medical_notes || "Sin notas";
-      childEnrollment.textContent = formatDate(data.enrollment_date);
+    if (error || !data) {
+      childName.textContent = "No se pudo cargar el perfil";
+      childSubtitle.textContent = error?.message || "Perfil no encontrado";
+      return;
     }
 
-    async function loadGuardians() {
-      const db = supabase();
+    const fullName =
+      data.full_name ||
+      [data.first_name, data.last_name].filter(Boolean).join(" ") ||
+      "Niño";
 
-      const { data, error } = await db
-        .from("child_guardians")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("child_id", CHILD_ID)
-        .order("is_primary", { ascending: false });
+    childName.textContent = fullName;
+    childSubtitle.textContent = "Centro de control del niño en DTC";
 
-      if (error) {
-        setListEmpty(guardiansList, error.message || "No se pudieron cargar los guardianes.");
-        return;
-      }
-
-      const rows = data || [];
-
-      if (!rows.length) {
-        setListEmpty(guardiansList, "No hay guardianes registrados.");
-        return;
-      }
-
-      guardiansList.innerHTML = rows.map(row => `
-        <article class="list-card">
-          <h3>${row.full_name}</h3>
-          <div class="list-meta">
-            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
-            <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
-            <div><strong>Email:</strong> ${row.email || "—"}</div>
-            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
-            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
-          </div>
-          <div class="pill-row">
-            ${row.is_primary ? `<span class="pill">Principal</span>` : ""}
-            ${row.is_legal_responsible ? `<span class="pill">Responsable legal</span>` : ""}
-            <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
-          </div>
-        </article>
-      `).join("");
+    if (data.profile_photo_url) {
+      childAvatar.innerHTML = `<img src="${data.profile_photo_url}" alt="${fullName}" />`;
+    } else {
+      childAvatar.textContent = (fullName || "N").charAt(0).toUpperCase();
     }
 
-    async function loadEmergencyContacts() {
-      const db = supabase();
+    childDob.textContent = formatDate(data.date_of_birth);
+    childClassroom.textContent = data.classroom || "—";
+    childAllergies.textContent = data.allergies || "Sin registro";
+    childMedical.textContent = data.medical_notes || "Sin notas";
+    childEnrollment.textContent = formatDate(data.enrollment_date);
+  }
 
-      const { data, error } = await db
-        .from("child_emergency_contacts")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("child_id", CHILD_ID)
-        .order("priority_order", { ascending: true });
+  async function loadGuardians() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_guardians")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("is_primary", { ascending: false });
 
-      if (error) {
-        setListEmpty(emergencyList, error.message || "No se pudieron cargar los contactos de emergencia.");
-        return;
-      }
-
-      const rows = data || [];
-
-      if (!rows.length) {
-        setListEmpty(emergencyList, "No hay contactos de emergencia registrados.");
-        return;
-      }
-
-      emergencyList.innerHTML = rows.map(row => `
-        <article class="list-card">
-          <h3>${row.full_name}</h3>
-          <div class="list-meta">
-            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
-            <div><strong>Teléfono principal:</strong> ${row.phone || "—"}</div>
-            <div><strong>Teléfono alterno:</strong> ${row.alt_phone || "—"}</div>
-            <div><strong>Email:</strong> ${row.email || "—"}</div>
-            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
-            <div><strong>Prioridad:</strong> ${row.priority_order ?? "—"}</div>
-            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
-          </div>
-          <div class="pill-row">
-            <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
-          </div>
-        </article>
-      `).join("");
+    if (error) {
+      setListEmpty(guardiansList, error.message || "No se pudieron cargar los guardianes.");
+      return;
     }
 
-    async function loadPickupAuthorizations() {
-      const db = supabase();
-
-      const { data, error } = await db
-        .from("child_pickup_authorizations")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("child_id", CHILD_ID)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        setListEmpty(pickupList, error.message || "No se pudieron cargar las autorizaciones de recogida.");
-        return;
-      }
-
-      const rows = data || [];
-
-      if (!rows.length) {
-        setListEmpty(pickupList, "No hay personas autorizadas para recoger registradas.");
-        return;
-      }
-
-      pickupList.innerHTML = rows.map(row => `
-        <article class="list-card">
-          <h3>${row.full_name}</h3>
-          <div class="list-meta">
-            <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
-            <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
-            <div><strong>Email:</strong> ${row.email || "—"}</div>
-            <div><strong>Dirección:</strong> ${row.address || "—"}</div>
-            <div><strong>Fecha efectiva:</strong> ${formatDate(row.effective_date)}</div>
-            <div><strong>Expira:</strong> ${formatDate(row.expires_on)}</div>
-            <div><strong>Notas:</strong> ${row.notes || "—"}</div>
-          </div>
-          <div class="pill-row">
-            <span class="pill">${row.is_active ? "Activo" : "Inactivo"}</span>
-            <span class="pill muted">Face ID: ${yesNo(row.face_enabled)}</span>
-            <span class="pill muted">PIN: ${yesNo(row.pin_enabled)}</span>
-          </div>
-        </article>
-      `).join("");
+    const rows = data || [];
+    if (!rows.length) {
+      setListEmpty(guardiansList, "No hay guardianes registrados.");
+      return;
     }
 
-    async function loadMedical() {
-      const db = supabase();
+    guardiansList.innerHTML = rows.map(row => `
+      <article class="list-card">
+        <h3>${row.full_name}</h3>
+        <div class="list-meta">
+          <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+          <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
+          <div><strong>Email:</strong> ${row.email || "—"}</div>
+          <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+          <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+        </div>
+        <div class="pill-row">
+          ${row.is_primary ? `<span class="pill">Principal</span>` : ""}
+          ${row.is_legal_responsible ? `<span class="pill">Responsable legal</span>` : ""}
+          <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
+        </div>
+      </article>
+    `).join("");
+  }
 
-      const { data, error } = await db
-        .from("child_medical")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("child_id", CHILD_ID)
-        .single();
+  async function loadEmergencyContacts() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_emergency_contacts")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("priority_order", { ascending: true });
 
-      if (error || !data) {
-        medPhysician.textContent = "Sin registro";
-        medPhysicianPhone.textContent = "—";
-        medHospital.textContent = "—";
-        medHospitalPhone.textContent = "—";
-        medEmergencyConsent.textContent = "—";
-        medAllergySummary.textContent = "—";
-        medHospitalizations.textContent = "—";
-        medChronic.textContent = "—";
-        medSpecial.textContent = "—";
-        medNotes.textContent = error?.message || "Sin datos médicos";
-        return;
-      }
-
-      medPhysician.textContent = data.primary_physician_name || "—";
-      medPhysicianPhone.textContent = data.primary_physician_phone || "—";
-      medHospital.textContent = data.preferred_hospital || "—";
-      medHospitalPhone.textContent = data.hospital_phone || "—";
-      medEmergencyConsent.textContent = yesNo(data.emergency_medical_consent);
-      medAllergySummary.textContent = data.child_allergies_summary || "—";
-      medHospitalizations.textContent = data.hospitalizations_and_illnesses || "—";
-      medChronic.textContent = data.chronic_conditions || "—";
-      medSpecial.textContent = data.special_health_conditions || "—";
-      medNotes.textContent = data.notes || "—";
+    if (error) {
+      setListEmpty(emergencyList, error.message || "No se pudieron cargar los contactos de emergencia.");
+      return;
     }
 
-    async function loadMemories() {
-      const db = supabase();
+    const rows = data || [];
+    if (!rows.length) {
+      setListEmpty(emergencyList, "No hay contactos de emergencia registrados.");
+      return;
+    }
 
-      const { data, error } = await db
-        .from("child_memories")
-        .select("*")
-        .eq("organization_id", ORGANIZATION_ID)
-        .eq("child_id", CHILD_ID)
-        .order("captured_at", { ascending: false });
+    emergencyList.innerHTML = rows.map(row => `
+      <article class="list-card">
+        <h3>${row.full_name}</h3>
+        <div class="list-meta">
+          <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+          <div><strong>Teléfono principal:</strong> ${row.phone || "—"}</div>
+          <div><strong>Teléfono alterno:</strong> ${row.alt_phone || "—"}</div>
+          <div><strong>Email:</strong> ${row.email || "—"}</div>
+          <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+          <div><strong>Prioridad:</strong> ${row.priority_order ?? "—"}</div>
+          <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+        </div>
+        <div class="pill-row">
+          <span class="pill muted">Texto: ${yesNo(row.can_text)}</span>
+        </div>
+      </article>
+    `).join("");
+  }
 
-      if (error) {
-        memoryStatus.textContent = error.message || "No se pudieron cargar las memorias";
-        return;
-      }
+  async function loadPickupAuthorizations() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_pickup_authorizations")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("created_at", { ascending: false });
 
-      const rows = data || [];
+    if (error) {
+      setListEmpty(pickupList, error.message || "No se pudieron cargar las autorizaciones de recogida.");
+      return;
+    }
 
-      if (!rows.length) {
-        memoriesList.innerHTML = `
-          <div class="empty-state">
-            No hay memorias guardadas todavía para este niño.
+    const rows = data || [];
+    if (!rows.length) {
+      setListEmpty(pickupList, "No hay personas autorizadas para recoger registradas.");
+      return;
+    }
+
+    pickupList.innerHTML = rows.map(row => `
+      <article class="list-card">
+        <h3>${row.full_name}</h3>
+        <div class="list-meta">
+          <div><strong>Relación:</strong> ${row.relationship_to_child || "—"}</div>
+          <div><strong>Teléfono:</strong> ${row.phone || "—"}</div>
+          <div><strong>Email:</strong> ${row.email || "—"}</div>
+          <div><strong>Dirección:</strong> ${row.address || "—"}</div>
+          <div><strong>Fecha efectiva:</strong> ${formatDate(row.effective_date)}</div>
+          <div><strong>Expira:</strong> ${formatDate(row.expires_on)}</div>
+          <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+        </div>
+        <div class="pill-row">
+          <span class="pill">${row.is_active ? "Activo" : "Inactivo"}</span>
+          <span class="pill muted">Face ID: ${yesNo(row.face_enabled)}</span>
+          <span class="pill muted">PIN: ${yesNo(row.pin_enabled)}</span>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function loadMedical() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_medical")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .single();
+
+    if (error || !data) {
+      medPhysician.textContent = "Sin registro";
+      medPhysicianPhone.textContent = "—";
+      medHospital.textContent = "—";
+      medHospitalPhone.textContent = "—";
+      medEmergencyConsent.textContent = "—";
+      medAllergySummary.textContent = "—";
+      medHospitalizations.textContent = "—";
+      medChronic.textContent = "—";
+      medSpecial.textContent = "—";
+      medNotes.textContent = error?.message || "Sin datos médicos";
+      return;
+    }
+
+    medPhysician.textContent = data.primary_physician_name || "—";
+    medPhysicianPhone.textContent = data.primary_physician_phone || "—";
+    medHospital.textContent = data.preferred_hospital || "—";
+    medHospitalPhone.textContent = data.hospital_phone || "—";
+    medEmergencyConsent.textContent = yesNo(data.emergency_medical_consent);
+    medAllergySummary.textContent = data.child_allergies_summary || "—";
+    medHospitalizations.textContent = data.hospitalizations_and_illnesses || "—";
+    medChronic.textContent = data.chronic_conditions || "—";
+    medSpecial.textContent = data.special_health_conditions || "—";
+    medNotes.textContent = data.notes || "—";
+  }
+
+  async function loadSleepPlan() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_sleep_plan")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .single();
+
+    if (error || !data) {
+      sleepNapArea.textContent = "Sin registro";
+      sleepNapSurface.textContent = "—";
+      sleepNapSupervision.textContent = "—";
+      sleepNightArea.textContent = "—";
+      sleepNightSurface.textContent = "—";
+      sleepNightSupervision.textContent = "—";
+      sleepParentSigned.textContent = "—";
+      sleepProviderSigned.textContent = "—";
+      sleepFormVersion.textContent = "—";
+      sleepNotes.textContent = error?.message || "Sin datos";
+      return;
+    }
+
+    sleepNapArea.textContent = data.nap_area || "—";
+    sleepNapSurface.textContent = prettyEnum(data.nap_surface);
+    sleepNapSupervision.textContent = prettyEnum(data.nap_supervision_type);
+    sleepNightArea.textContent = data.night_sleep_area || "—";
+    sleepNightSurface.textContent = prettyEnum(data.night_sleep_surface);
+    sleepNightSupervision.textContent = prettyEnum(data.night_supervision_type);
+    sleepParentSigned.textContent = formatDate(data.parent_signed_at);
+    sleepProviderSigned.textContent = formatDate(data.provider_signed_at);
+    sleepFormVersion.textContent = data.form_version || "—";
+    sleepNotes.textContent = data.notes || "—";
+  }
+
+  async function loadFeedingPlan() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_feeding_plan")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .single();
+
+    if (error || !data) {
+      feedingCacfp.textContent = "Sin registro";
+      feedingFormula.textContent = "—";
+      feedingFormulaProvider.textContent = "—";
+      feedingSolidProvider.textContent = "—";
+      feedingScheduleType.textContent = "—";
+      feedingScheduleNotes.textContent = "—";
+      feedingParentSigned.textContent = "—";
+      feedingProviderSigned.textContent = "—";
+      feedingFormVersion.textContent = "—";
+      feedingNotes.textContent = error?.message || "Sin datos";
+      return;
+    }
+
+    feedingCacfp.textContent = yesNo(data.is_cacfp);
+    feedingFormula.textContent = data.formula_name || "—";
+    feedingFormulaProvider.textContent = prettyEnum(data.formula_provider);
+    feedingSolidProvider.textContent = prettyEnum(data.solid_food_provider);
+    feedingScheduleType.textContent = prettyEnum(data.feeding_schedule_type);
+    feedingScheduleNotes.textContent = data.feeding_schedule_notes || "—";
+    feedingParentSigned.textContent = formatDate(data.parent_signed_at);
+    feedingProviderSigned.textContent = formatDate(data.provider_signed_at);
+    feedingFormVersion.textContent = data.form_version || "—";
+    feedingNotes.textContent = data.notes || "—";
+  }
+
+  async function loadTransportation() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_transportation")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .single();
+
+    if (error || !data) {
+      transportAllowed.textContent = "Sin registro";
+      transportInformed.textContent = "—";
+      transportBy.textContent = "—";
+      transportScheduleType.textContent = "—";
+      transportScheduleNotes.textContent = "—";
+      transportParentName.textContent = "—";
+      transportParentSigned.textContent = "—";
+      transportFormVersion.textContent = "—";
+      transportNotes.textContent = error?.message || "Sin datos";
+      return;
+    }
+
+    transportAllowed.textContent = yesNo(data.transportation_allowed);
+    transportInformed.textContent = yesNo(data.informed_of_transportation_plan);
+    transportBy.textContent = data.transport_by || "—";
+    transportScheduleType.textContent = prettyEnum(data.schedule_type);
+    transportScheduleNotes.textContent = data.schedule_notes || "—";
+    transportParentName.textContent = data.parent_printed_name || "—";
+    transportParentSigned.textContent = formatDate(data.parent_signed_at);
+    transportFormVersion.textContent = data.form_version || "—";
+    transportNotes.textContent = data.notes || "—";
+  }
+
+  async function loadConsents() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_consents")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setListEmpty(consentsList, error.message || "No se pudieron cargar los consentimientos.");
+      return;
+    }
+
+    const rows = data || [];
+    if (!rows.length) {
+      setListEmpty(consentsList, "No hay consentimientos registrados.");
+      return;
+    }
+
+    consentsList.innerHTML = rows.map(row => `
+      <article class="list-card">
+        <h3>${prettyEnum(row.consent_type)}</h3>
+        <div class="list-meta">
+          <div><strong>Otorgado:</strong> ${yesNo(row.granted)}</div>
+          <div><strong>Fecha:</strong> ${formatDate(row.granted_at)}</div>
+          <div><strong>Expira:</strong> ${formatDate(row.expires_at)}</div>
+          <div><strong>Firmado por:</strong> ${row.signed_by_name || "—"}</div>
+          <div><strong>Rol:</strong> ${row.signed_by_role || "—"}</div>
+          <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+        </div>
+        <div class="pill-row">
+          ${row.granted ? `<span class="pill success">Activo</span>` : `<span class="pill attention">No otorgado</span>`}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function loadDocuments() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_documents")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setListEmpty(documentsList, error.message || "No se pudieron cargar los documentos.");
+      return;
+    }
+
+    const rows = data || [];
+    if (!rows.length) {
+      setListEmpty(documentsList, "No hay documentos registrados.");
+      return;
+    }
+
+    documentsList.innerHTML = rows.map(row => `
+      <article class="list-card">
+        <h3>${row.title}</h3>
+        <div class="list-meta">
+          <div><strong>Tipo:</strong> ${prettyEnum(row.document_type)}</div>
+          <div><strong>Archivo:</strong> ${row.file_name || "—"}</div>
+          <div><strong>Estado:</strong> ${prettyEnum(row.status)}</div>
+          <div><strong>Estado / País:</strong> ${row.state_code || "—"}</div>
+          <div><strong>Código de formulario:</strong> ${row.form_code || "—"}</div>
+          <div><strong>Versión:</strong> ${row.form_version || "—"}</div>
+          <div><strong>Firmado por:</strong> ${row.signed_by_name || "—"}</div>
+          <div><strong>Fecha de firma:</strong> ${formatDate(row.signed_at)}</div>
+          <div><strong>Expira:</strong> ${formatDate(row.expires_at)}</div>
+          <div><strong>Notas:</strong> ${row.notes || "—"}</div>
+        </div>
+        <div class="pill-row">
+          <span class="pill muted">Mime: ${row.mime_type || "—"}</span>
+          ${row.file_url ? `<a class="btn btn-primary" href="${row.file_url}" target="_blank" rel="noopener noreferrer">Abrir archivo</a>` : ""}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function loadMemories() {
+    const db = supabase();
+    const { data, error } = await db
+      .from("child_memories")
+      .select("*")
+      .eq("organization_id", ORGANIZATION_ID)
+      .eq("child_id", CHILD_ID)
+      .order("captured_at", { ascending: false });
+a
+    if (error) {
+      memoryStatus.textContent = error.message || "No se pudieron cargar las memorias";
+      return;
+    }
+
+    const rows = data || [];
+    if (!rows.length) {
+      memoriesList.innerHTML = `<div class="empty-state">No hay memorias guardadas todavía para este niño.</div>`;
+      return;
+    }
+
+    memoriesList.innerHTML = rows.map(row => `
+      <article class="timeline-item">
+        <span class="timeline-dot"></span>
+        <div class="timeline-card">
+          <div class="timeline-top">
+            <h3>${row.title}</h3>
+            <span class="tag">${row.memory_type}</span>
           </div>
-        `;
-        return;
-      }
-
-      memoriesList.innerHTML = rows.map(row => `
-        <article class="timeline-item">
-          <span class="timeline-dot"></span>
-          <div class="timeline-card">
-            <div class="timeline-top">
-              <h3>${row.title}</h3>
-              <span class="tag">${row.memory_type}</span>
-            </div>
-            <p>${row.description || "Sin descripción."}</p>
-            <div class="timeline-meta">
-              <span class="timeline-date">${formatDateTime(row.captured_at)}</span>
-              ${row.milestone_type ? `<span class="timeline-type">${row.milestone_type}</span>` : ""}
-            </div>
+          <p>${row.description || "Sin descripción."}</p>
+          <div class="timeline-meta">
+            <span class="timeline-date">${formatDateTime(row.captured_at)}</span>
+            ${row.milestone_type ? `<span class="timeline-type">${row.milestone_type}</span>` : ""}
           </div>
-        </article>
-      `).join("");
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function addTestMemory() {
+    memoryStatus.textContent = "Guardando memoria...";
+    const db = supabase();
+
+    const { error } = await db
+      .from("child_memories")
+      .insert([{
+        organization_id: ORGANIZATION_ID,
+        child_id: CHILD_ID,
+        memory_type: "activity",
+        title: "Actividad especial",
+        description: "Emma participó con alegría en una actividad creativa.",
+        media_type: "none",
+        milestone_type: "art_activity",
+        share_with_guardians: true
+      }]);
+
+    if (error) {
+      memoryStatus.textContent = error.message || "No se pudo guardar la memoria";
+      return;
     }
 
-    async function addTestMemory() {
-      memoryStatus.textContent = "Guardando memoria...";
-
-      const db = supabase();
-
-      const { error } = await db
-        .from("child_memories")
-        .insert([
-          {
-            organization_id: ORGANIZATION_ID,
-            child_id: CHILD_ID,
-            memory_type: "activity",
-            title: "Actividad especial",
-            description: "Emma participó con alegría en una actividad creativa.",
-            media_type: "none",
-            milestone_type: "art_activity",
-            share_with_guardians: true
-          }
-        ]);
-
-      if (error) {
-        memoryStatus.textContent = error.message || "No se pudo guardar la memoria";
-        return;
-      }
-
-      memoryStatus.textContent = "Memoria guardada correctamente.";
-      await loadMemories();
-    }
-
-    addMemoryBtn?.addEventListener("click", addTestMemory);
-
-    await loadChildProfile();
-    await loadGuardians();
-    await loadEmergencyContacts();
-    await loadPickupAuthorizations();
-    await loadMedical();
+    memoryStatus.textContent = "Memoria guardada correctamente.";
     await loadMemories();
-  </script>
+  }
+
+  const dailyModule = initChildProfileDaily({
+    supabase,
+    organizationId: ORGANIZATION_ID,
+    childId: CHILD_ID,
+    activateTab,
+    formatDateTime,
+    yesNo,
+    setListEmpty
+  });
+
+  addMemoryBtn?.addEventListener("click", addTestMemory);
+
+  await loadChildProfile();
+  await loadGuardians();
+  await loadEmergencyContacts();
+  await loadPickupAuthorizations();
+  await loadMedical();
+  await loadSleepPlan();
+  await loadFeedingPlan();
+  await loadTransportation();
+  await loadConsents();
+  await loadDocuments();
+  await dailyModule.loadDailyTimeline();
+  await loadMemories();
+</script>
 </body>
 </html>
